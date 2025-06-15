@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Mapping strings
+water_base="watre"
+stir_base="stir."
+bestchol_base="bestchol."
+
+# Convert base string to decimal
+base_to_decimal() {
+  local value="$1"
+  local base_chars="$2"
+  local base_length=${#base_chars}
+  local len=${#value}
+  local result=0
+
+  for (( i=0; i<$len; i++ )); do
+    char="${value:$i:1}"
+    digit=$(expr index "$base_chars" "$char")
+    digit=$((digit - 1))
+    result=$((result * base_length + digit))
+  done
+  echo "$result"
+}
+
+# Convert decimal to base string
+decimal_to_base() {
+  local value=$1
+  local base_chars="$2"
+  local base_length=${#base_chars}
+  local result=""
+
+  if [ "$value" -eq 0 ]; then
+    echo "${base_chars:0:1}"
+    return
+  fi
+
+  while [ "$value" -gt 0 ]; do
+    remainder=$((value % base_length))
+    result="${base_chars:$remainder:1}$result"
+    value=$((value / base_length))
+  done
+
+  echo "$result"
+}
+
+# Get values from env
+dec_water=$(base_to_decimal "$WATER" "watre")
+dec_stir=$(base_to_decimal "$STIR" "stir.")
+
+sum=$((dec_water + dec_stir))
+
+# Convert result to bestchol base
+decimal_to_base "$sum" "bestchol."
